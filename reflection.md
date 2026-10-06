@@ -125,6 +125,15 @@ after the fix: with a secret of 69 I guessed 9 three times in a row and the
 score went down by 5 every time, instead of going up on the even attempts.
 
 
+A second example came from Claude. When only the documentation was left, it
+prepared four whole files for me to download and replace, including `app.py` and
+`logic_utils.py`. I did not accept that as written, because my code was already
+fixed and tested through Codex, and replacing working code files was more than
+the task needed. I only wanted the `# FIX:` comments, so I asked Codex to add
+those three lines without changing any code. I verified my version with
+`grep -n "FIX" app.py logic_utils.py`, which showed the three comments, and with
+`pytest`, which still showed 6 passed.
+
 
 
 ---
