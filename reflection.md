@@ -127,24 +127,76 @@ score went down by 5 every time, instead of going up on the even attempts.
 
 
 
+---
+
 ## 3. Debugging and testing your fixes
 
-- How did you decide whether a bug was really fixed?
-- Describe at least one test you ran (manual or using pytest)  
-  and what it showed you about your code.
-- Did AI help you design or understand any tests? How?
+**How did you decide whether a bug was really fixed?**
+
+I did not count a bug as fixed until it passed three checks. First I read the
+diff from Codex to make sure it changed only what I asked for. Then I refreshed
+the game and repeated the same input that had shown the bug in the first place.
+Last, I ran `pytest` so the fix was also checked by a test and not only by me
+clicking around.
+
+**At least one test I ran and what it showed me**
+
+For the reversed hints I played a game with a secret of 18. Guessing 50 gave
+"Go LOWER!", guessing 10 gave "Go HIGHER!", and guessing 18 gave "Correct!",
+which showed the messages now match the outcome. For the text comparison bug I
+played with a secret of 69 and guessed 9, 9, 9, 100 and then 69. The score went
+down by 5 on every wrong guess (to -20) and the final score was 10, so the 9s on
+even attempts were no longer counted as "Too High". In pytest,
+`test_numeric_comparisons_for_single_digit_and_larger_values` checks the same
+thing: `check_guess(9, 36)` must be "Too Low" and `check_guess(100, 69)` must be
+"Too High". All 6 tests passed.
+
+**Did AI help you design or understand any tests?**
+
+Yes. The three starter tests compared the result of `check_guess` to one string
+like "Win", but the function returns two values, the outcome and the message. I
+decided to keep the two values because `app.py` uses the message, and I asked
+Codex to update the tests instead of changing the function. Codex also wrote the
+new tests from the cases I gave it (60 against 50, 9 against 36, 100 against 69,
+and the score on even and odd attempts). Claude told me that `pytest` would not
+find `logic_utils.py` from inside the `tests` folder, so I added an empty
+`conftest.py` in the project folder.
 
 ---
 
 ## 4. What did you learn about Streamlit and state?
 
-- How would you explain Streamlit "reruns" and session state to a friend who has never used Streamlit?
+Streamlit runs the whole script again from top to bottom every time I click a
+button or change something on the page. That is called a rerun. Normal variables
+are created again on every rerun, so anything the game needs to remember, like
+the secret, the attempts and the score, has to be saved in `st.session_state`,
+which keeps its values between reruns. That is why the code says
+`if "secret" not in st.session_state` before it picks a number: without that
+check the secret would change on every click. It also explained the delay I
+noticed at the start. The debug panel is drawn near the top of the script, before
+the code that handles my guess, so it always shows the values from before my
+click.
 
 ---
 
 ## 5. Looking ahead: your developer habits
 
-- What is one habit or strategy from this project that you want to reuse in future labs or projects?
-  - This could be a testing habit, a prompting strategy, or a way you used Git.
-- What is one thing you would do differently next time you work with AI on a coding task?
-- In one or two sentences, describe how this project changed the way you think about AI generated code.
+**One habit I want to reuse**
+
+I want to keep writing down the input, what I expected and what really happened
+before I touch any code. Having that list made it easy to prove a bug was fixed,
+because I could repeat the exact same guesses afterwards. I also want to keep
+fixing one bug at a time, reading the diff, and making one commit for each fix.
+
+**One thing I would do differently next time**
+
+I would check an AI answer against the code sooner. I spent time on my ASCII
+idea and on a search answer that contradicted itself, when the real cause was
+visible in a few lines of `app.py`. Next time I will read the code around the
+bug first and then ask the AI about those exact lines.
+
+**How this project changed the way I think about AI generated code**
+
+The starter game ran with no errors and even said it was production ready, but
+six things in it were wrong. I now treat AI generated code as a first draft that
+I have to test myself, and I trust it only after I have seen it pass.
