@@ -98,6 +98,7 @@ if submit:
     else:
         st.session_state.history.append(guess_int)
 
+        # FIX: Codex keeps the secret numeric instead of converting it on even attempts.
         outcome, message = check_guess(guess_int, st.session_state.secret)
 
         if show_hint:

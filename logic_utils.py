@@ -41,6 +41,7 @@ def check_guess(guess, secret):
     if guess == secret:
         return "Win", "🎉 Correct!"
 
+    # FIX: Codex swapped the hint messages and restored numeric comparison.
     if guess > secret:
         return "Too High", "📉 Go LOWER!"
     else:
@@ -56,6 +57,7 @@ def update_score(current_score: int, outcome: str, attempt_number: int):
         return current_score + points
 
     if outcome == "Too High":
+        # FIX: Codex removed the +5 reward for wrong guesses on even attempts.
         return current_score - 5
 
     if outcome == "Too Low":
