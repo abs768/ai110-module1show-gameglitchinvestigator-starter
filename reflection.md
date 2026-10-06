@@ -81,13 +81,51 @@ Session D - Normal, clicked New Game after winning
 
 ---
 
+
 ## 2. How did you use AI as a teammate?
 
-- Which AI tools did you use on this project (for example: ChatGPT, Gemini, Copilot)?
-- Give one example of an AI suggestion that was correct (including what the AI suggested and how you verified the result).
-- Give one example of an AI suggestion you did not accept as written (including what the AI suggested, why you rejected or changed it, and how you verified your version). It does not have to be a suggestion that was wrong: over-engineered, out of scope, harder to read, or a poor fit for this codebase all count.
+**Which AI tools did you use on this project?**
 
----
+I used three AI tools. I used Claude to talk through the bugs I had noticed, to
+find the lines in the code that caused them, to help me write prompts, and to
+review the changes before I committed them. I used Codex to make the code changes
+in `app.py` and `logic_utils.py`. I also used the Google AI answer in search when I
+was trying to understand why the game compared 57 and 58 the wrong way.
+
+**One AI suggestion that was correct**
+
+I asked Codex to move the game logic into `logic_utils.py` and fix the reversed
+hints in `check_guess`. It swapped the two messages so that "Too High" returns
+"Go LOWER!" and "Too Low" returns "Go HIGHER!", and it kept the outcome labels
+and the (outcome, message) return value the same. This was correct because the
+labels were already right and only the messages were attached to the wrong case.
+I verified it by reading the diff to make sure nothing else changed, and then by
+playing the game with a secret of 18: guessing 50 gave "Go LOWER!", guessing 10
+gave "Go HIGHER!", and guessing 18 gave "Correct!".
+
+Claude also gave me an explanation of a bug that turned out to be correct. It
+said that on every even attempt `app.py` turned the secret into a string, so
+`9 > "36"` raised a `TypeError`, and the `except TypeError` block then compared
+"9" and "36" as text, which made 9 count as "Too High". It predicted that
+guessing 9 twice against a secret of 36 would give two different hints. I tried
+it in the starter game and got "Go HIGHER!" and then "Go LOWER!", with the score
+going up by 5, so the explanation matched what the game really did.
+
+**One AI suggestion I did not accept as written**
+
+When I first saw the secret 58 and the guess 57 give the wrong hint, I thought
+the game was comparing ASCII values, so I asked the Google AI whether "9" is
+greater than ":". Its answer started with "Yes, the character 9 is greater than
+a colon", but its own explanation right below said 57 is less than 58, so the
+colon is greater. The answer contradicted itself, so I did not accept it. It
+also pointed me in the wrong direction, because the game was never turning
+numbers into single characters. I verified the real cause by reading the code,
+where the secret was converted with `str()` on even attempts, and by testing
+after the fix: with a secret of 69 I guessed 9 three times in a row and the
+score went down by 5 every time, instead of going up on the even attempts.
+
+
+
 
 ## 3. Debugging and testing your fixes
 
